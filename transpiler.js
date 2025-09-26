@@ -7,12 +7,34 @@ import grammar from './grammar.js';
  * @returns {string} The equivalent JavaScript code.
  */
 function generate(ast) {
+    if (!ast) return ''; // Handle potential nulls from grammar
+    
     const generator = {
         Program: (node) => node.body.map(generate).join('\n'),
-        Comment: (node) => node.value,
+        ExpressionStatement: (node) => `${generate(node.expression)};`,
         VariableDeclaration: (node) => `let ${node.identifier} = ${generate(node.value)};`,
         Assignment: (node) => `${node.identifier} = ${generate(node.value)};`,
-        OutputCall: (node) => `console.log(${node.arguments.map(generate).join(', ')});`,
+        
+        CallExpression: (node) => {
+            const callee = generate(node.callee);
+            const args = node.arguments.map(generate).join(', ');
+            if (callee === '_') {
+                return `console.log(${args})`;
+            }
+            return `${callee}(${args})`;
+        },
+        
+        MemberExpression: (node) => `${generate(node.object)}.${generate(node.property)}`,
+        BinaryExpression: (node) => `(${generate(node.left)} ${node.operator} ${generate(node.right)})`,
+        
+        Block: (node) => {
+            if (node.properties.length === 0) return '{}';
+            const properties = node.properties.map(p => `  ${generate(p)}`).join(',\n');
+            return `{\n${properties}\n}`;
+        },
+        Property: (node) => `${node.key}: ${generate(node.value)}`,
+        
+        Identifier: (node) => node.name,
         NumericLiteral: (node) => node.value,
         StringLiteral: (node) => node.value,
     };
@@ -41,7 +63,11 @@ export function hi2js(sourceCode) {
             console.warn("Master, the grammar is ambiguous. Using the first parse tree.");
         }
         if (parser.results.length === 0) {
-            throw new Error("Unexpected end of input. The code is incomplete.");
+            // Throw an error only if the input was not empty.
+            if (sourceCode.trim().length > 0) {
+              throw new Error("Unexpected end of input. The code is incomplete.");
+            }
+            return ""; // Return empty string for empty input.
         }
         const ast = parser.results[0];
 
