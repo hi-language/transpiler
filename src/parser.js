@@ -7,6 +7,7 @@ class HiParser extends CstParser {
 
         const $ = this;
 
+        // --- Top Level Rules ---
         $.RULE('program', () => $.SUBRULE($.statements));
         $.RULE('statements', () => $.MANY(() => $.SUBRULE($.statement)));
 
@@ -19,13 +20,6 @@ class HiParser extends CstParser {
             ]);
         });
         
-        $.RULE('expressionStatement', () => $.SUBRULE($.expression));
-        
-        $.RULE('returnStatement', () => {
-            $.CONSUME(T.Caret);
-            $.OPTION(() => $.SUBRULE($.expression));
-        });
-
         $.RULE('declaration', () => {
             $.CONSUME(T.Identifier);
             $.CONSUME(T.Colon);
@@ -33,69 +27,21 @@ class HiParser extends CstParser {
         });
 
         $.RULE('assignment', () => {
-            // Note: This only allows simple identifiers for now, not member expressions.
             $.CONSUME(T.Identifier);
             $.CONSUME(T.Eq);
             $.SUBRULE($.expression);
         });
-
-        $.RULE('expression', () => $.SUBRULE($.conditionalExpression));
-
-        $.RULE('conditionalExpression', () => {
-            $.SUBRULE($.equalityExpression, { LABEL: 'condition' });
-            $.OPTION(() => {
-                $.CONSUME(T.Question);
-                $.SUBRULE2($.expression, { LABEL: 'consequent' });
-                $.OPTION2(() => {
-                    $.CONSUME(T.Colon);
-                    $.SUBRULE3($.expression, { LABEL: 'alternate' });
-                });
-            });
-        });
-
-        const buildBinaryExpressionRule = (name, higherPrecRule, operators) => {
-            $.RULE(name, () => {
-                $.SUBRULE(higherPrecRule, { LABEL: 'left' });
-                $.MANY(() => {
-                    $.CONSUME($.OR(operators));
-                    $.SUBRULE2(higherPrecRule, { LABEL: 'right' });
-                });
-            });
-        };
-
-        buildBinaryExpressionRule('equalityExpression', $.additiveExpression, [
-            { ALT: () => T.EqEq }
-        ]);
         
-        buildBinaryExpressionRule('additiveExpression', $.multiplicativeExpression, [
-            { ALT: () => T.Plus }, { ALT: () => T.Minus }
-        ]);
-
-        buildBinaryExpressionRule('multiplicativeExpression', $.callExpression, [
-            { ALT: () => T.Star }, { ALT: () => T.Slash }
-        ]);
-        
-        $.RULE('callExpression', () => {
-            $.SUBRULE($.memberExpression, { LABEL: 'callee' });
-            $.MANY(() => {
-                $.CONSUME(T.LParen);
-                $.OPTION(() => $.SUBRULE($.argumentList));
-                $.CONSUME(T.RParen);
-            });
+        $.RULE('returnStatement', () => {
+            $.CONSUME(T.Caret);
+            $.OPTION(() => $.SUBRULE($.expression));
         });
 
-        $.RULE('argumentList', () => $.SEPERATED_LIST($.expression, T.Comma));
+        $.RULE('expressionStatement', () => $.SUBRULE($.expression));
 
-        $.RULE('memberExpression', () => {
-            $.SUBRULE($.primary, { LABEL: 'object' });
-            $.MANY(() => {
-                $.OR([
-                    { ALT: () => { $.CONSUME(T.Dot); $.CONSUME(T.Identifier); }},
-                    { ALT: () => { $.CONSUME(T.LBracket); $.SUBRULE($.expression); $.CONSUME(T.RBracket); }}
-                ]);
-            });
-        });
+        // --- Expressions (ordered by precedence, highest to lowest) ---
 
+        // Primary is the highest precedence expression.
         $.RULE('primary', () => {
             $.OR([
                 { ALT: () => $.SUBRULE($.literal) },
@@ -112,11 +58,31 @@ class HiParser extends CstParser {
             ]);
         });
 
+        // Components used by Primary
         $.RULE('literal', () => $.OR([
             { ALT: () => $.CONSUME(T.Number) },
             { ALT: () => $.CONSUME(T.String) },
             { ALT: () => $.CONSUME(T.Null) }
         ]));
+        
+        $.RULE('arrayLiteral', () => {
+            $.CONSUME(T.LBracket);
+            $.OPTION(() => $.SEPERATED_LIST($.expression, T.Comma));
+            $.CONSUME(T.RBracket);
+        });
+
+        $.RULE('parameterList', () => {
+            $.CONSUME(T.LParen);
+            $.OPTION(() => $.SEPERATED_LIST(T.Identifier, T.Comma));
+            $.CONSUME(T.RParen);
+        });
+        
+        $.RULE('block', () => {
+            $.OPTION(() => $.SUBRULE($.parameterList));
+            $.CONSUME(T.LBrace);
+            $.SUBRULE($.statements);
+            $.CONSUME(T.RBrace);
+        });
         
         $.RULE('arrowExpression', () => {
             $.SUBRULE($.parameterList);
@@ -127,24 +93,68 @@ class HiParser extends CstParser {
             ]);
         });
 
-        $.RULE('arrayLiteral', () => {
-            $.CONSUME(T.LBracket);
-            $.OPTION(() => $.SEPERATED_LIST($.expression, T.Comma));
-            $.CONSUME(T.RBracket);
+        // MemberExpression consumes a Primary.
+        $.RULE('memberExpression', () => {
+            $.SUBRULE($.primary, { LABEL: 'object' });
+            $.MANY(() => {
+                $.OR([
+                    { ALT: () => { $.CONSUME(T.Dot); $.CONSUME(T.Identifier); }},
+                    { ALT: () => { $.CONSUME(T.LBracket); $.SUBRULE($.expression); $.CONSUME(T.RBracket); }}
+                ]);
+            });
         });
 
-        $.RULE('block', () => {
-            $.OPTION(() => $.SUBRULE($.parameterList));
-            $.CONSUME(T.LBrace);
-            $.SUBRULE($.statements);
-            $.CONSUME(T.RBrace);
+        // CallExpression consumes a MemberExpression.
+        $.RULE('callExpression', () => {
+            $.SUBRULE($.memberExpression, { LABEL: 'callee' });
+            $.MANY(() => {
+                $.CONSUME(T.LParen);
+                $.OPTION(() => $.SUBRULE($.argumentList));
+                $.CONSUME(T.RParen);
+            });
         });
         
-        $.RULE('parameterList', () => {
-            $.CONSUME(T.LParen);
-            $.OPTION(() => $.SEPERATED_LIST(T.Identifier, T.Comma));
-            $.CONSUME(T.RParen);
+        $.RULE('argumentList', () => $.SEPERATED_LIST($.expression, T.Comma));
+
+        // Binary Expressions are defined with a helper.
+        const buildBinaryExpressionRule = (name, higherPrecRule, operators) => {
+            $.RULE(name, () => {
+                $.SUBRULE(higherPrecRule, { LABEL: 'left' });
+                $.MANY(() => {
+                    $.CONSUME($.OR(operators));
+                    $.SUBRULE2(higherPrecRule, { LABEL: 'right' });
+                });
+            });
+        };
+
+        // Define binary expressions from highest to lowest precedence.
+        buildBinaryExpressionRule('multiplicativeExpression', $.callExpression, [
+            { ALT: () => T.Star }, { ALT: () => T.Slash }
+        ]);
+
+        buildBinaryExpressionRule('additiveExpression', $.multiplicativeExpression, [
+            { ALT: () => T.Plus }, { ALT: () => T.Minus }
+        ]);
+
+        buildBinaryExpressionRule('equalityExpression', $.additiveExpression, [
+            { ALT: () => T.EqEq }
+        ]);
+
+        // ConditionalExpression consumes an EqualityExpression.
+        $.RULE('conditionalExpression', () => {
+            $.SUBRULE($.equalityExpression, { LABEL: 'condition' });
+            $.OPTION(() => {
+                $.CONSUME(T.Question);
+                $.SUBRULE2($.expression, { LABEL: 'consequent' });
+                $.OPTION2(() => {
+                    $.CONSUME(T.Colon);
+                    $.SUBRULE3($.expression, { LABEL: 'alternate' });
+                });
+            });
         });
+        
+        // Expression is the lowest precedence rule, forming the entry point for the chain.
+        $.RULE('expression', () => $.SUBRULE($.conditionalExpression));
         
         this.performSelfAnalysis();
     }
