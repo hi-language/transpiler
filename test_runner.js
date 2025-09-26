@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, basename } from 'path';
 import { execSync } from 'child_process';
+import { hi2js } from './transpiler.js';
 
 const testDir = 'test';
 const srcDir = join(testDir, 'src');
@@ -60,17 +61,6 @@ function generateCrashReport(error, step) {
 
 async function run() {
   try {
-    // 1. Build Step
-    try {
-      console.log("Building parser from grammar, Master...");
-      execSync('npm run build-parser');
-    } catch (buildError) {
-      throw { step: 'Build Step', error: buildError.stderr || buildError.message };
-    }
-
-    // 2. Transpiler Import & Test Execution
-    const { hi2js } = await import('./transpiler.js');
-
     const testFiles = readdirSync(srcDir).filter(file => file.endsWith('.hi'));
     const results = [];
 
