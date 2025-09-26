@@ -1,74 +1,101 @@
 # Hi Language Test Results
 
-**Run at:** 2025-09-26T17:09:59.761Z
+**Run at:** 2025-09-26T17:14:42.404Z
 
 | Test Case | Status |
 |-----------|--------|
-| Initialization Step | ❌ FAIL |
+| `arrays.hi` | ❌ FAIL |
+| `conditionals.hi` | ❌ FAIL |
+| `declarations.hi` | ✅ PASS |
+| `functions.hi` | ❌ FAIL |
+| `nested_object.hi` | ✅ PASS |
+| `object_multi.hi` | ✅ PASS |
+| `precedence.hi` | ✅ PASS |
+| `simple_io.hi` | ❌ FAIL |
 
 ---
 
 ## Failures
 
-### `Initialization Step`
+### `arrays.hi`
 
-**Reason:** Master, the test runner encountered a fatal error.
+**Reason:** Transpilation or execution error
 
 **Error:**
 ```
-Error: Parser Definition Errors detected:
- Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, Dot, Identifier> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, Number> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, String> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, Null> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, Identifier> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, At> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, LParen> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, LBrace> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
--------------------------------
-Ambiguous Alternatives Detected: <2 ,4> in <OR> inside <statement> Rule,
-<Identifier, LBracket, LBracket> may appears as a prefix path in all these alternatives.
-See: https://chevrotain.io/docs/guide/resolving_grammar_errors.html#AMBIGUOUS_ALTERNATIVES
-For Further details.
-    at file:///home/runner/work/transpiler/transpiler/node_modules/chevrotain/lib/src/parse/parser/parser.js:140:23
-    at HiParser.TRACE_INIT (file:///home/runner/work/transpiler/transpiler/node_modules/chevrotain/lib/src/parse/parser/traits/perf_tracer.js:44:20)
-    at HiParser.performSelfAnalysis (file:///home/runner/work/transpiler/transpiler/node_modules/chevrotain/lib/src/parse/parser/parser.js:66:14)
-    at new HiParser (file:///home/runner/work/transpiler/transpiler/src/parser.js:221:14)
-    at file:///home/runner/work/transpiler/transpiler/src/parser.js:225:23
-    at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
-    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
-    at async run (file:///home/runner/work/transpiler/transpiler/test_runner.js:83:21)
+Parsing error: Redundant input, expecting EOF but found: =
+```
+
+---
+
+### `conditionals.hi`
+
+**Reason:** Transpilation or execution error
+
+**Error:**
+```
+Command failed: node
+[stdin]:9
+let status = ("ok"((status == "ok")) ? (() => {
+                    ^
+
+ReferenceError: Cannot access 'status' before initialization
+    at [stdin]:9:21
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:118:14
+    at [stdin]-wrapper:6:24
+    at runScript (node:internal/process/execution:101:62)
+    at evalScript (node:internal/process/execution:133:3)
+    at node:internal/main/eval_stdin:32:5
+    at Socket.<anonymous> (node:internal/process/execution:234:5)
+    at Socket.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+
+Node.js v20.19.5
+
+```
+
+**Generated JavaScript:**
+```js
+let a = 10;
+let b = 20;
+let max = ((a > b) ? (() => {
+  return a;
+})() : (() => {
+  return b;
+})());
+console.log(max);
+let status = ("ok"((status == "ok")) ? (() => {
+  return console.log("Status is OK");
+})() : null);
+let grade = ((max > 15) ? (() => {
+  return "A";
+})() : (() => {
+  return "B";
+})());
+console.log(grade);
+```
+
+---
+
+### `functions.hi`
+
+**Reason:** Transpilation or execution error
+
+**Error:**
+```
+Parsing error: Expecting token of type --> RBrace <-- but found --> ',' <--
+```
+
+---
+
+### `simple_io.hi`
+
+**Reason:** Transpilation or execution error
+
+**Error:**
+```
+Parsing error: Redundant input, expecting EOF but found: =
 ```
 
 ---
