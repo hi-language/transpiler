@@ -67,13 +67,25 @@ class HiParser extends CstParser {
         
         $.RULE('arrayLiteral', () => {
             $.CONSUME(T.LBracket);
-            $.OPTION(() => $.SEPERATED_LIST($.expression, T.Comma));
+            $.OPTION(() => {
+                $.SUBRULE($.expression);
+                $.MANY(() => {
+                    $.CONSUME(T.Comma);
+                    $.SUBRULE2($.expression);
+                });
+            });
             $.CONSUME(T.RBracket);
         });
 
         $.RULE('parameterList', () => {
             $.CONSUME(T.LParen);
-            $.OPTION(() => $.SEPERATED_LIST(T.Identifier, T.Comma));
+            $.OPTION(() => {
+                $.CONSUME(T.Identifier);
+                $.MANY(() => {
+                    $.CONSUME(T.Comma);
+                    $.CONSUME2(T.Identifier);
+                });
+            });
             $.CONSUME(T.RParen);
         });
         
@@ -114,7 +126,13 @@ class HiParser extends CstParser {
             });
         });
         
-        $.RULE('argumentList', () => $.SEPERATED_LIST($.expression, T.Comma));
+        $.RULE('argumentList', () => {
+            $.SUBRULE($.expression);
+            $.MANY(() => {
+                $.CONSUME(T.Comma);
+                $.SUBRULE2($.expression);
+            });
+        });
 
         // Binary Expressions are defined with a helper.
         const buildBinaryExpressionRule = (name, higherPrecRule, operators) => {
