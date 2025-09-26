@@ -80,7 +80,7 @@ function generateMarkdownReport(results) {
 
 async function run() {
   // Dynamic import allows us to catch module-level errors.
-  const { hi2js } = await import('./transpiler.js');
+  const { hi2js } = await import('./src/index.js');
 
   const testFiles = readdirSync(srcDir).filter(file => file.endsWith('.hi'));
   const results = [];
