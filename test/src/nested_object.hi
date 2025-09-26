@@ -1,0 +1,9 @@
+// Nested object should parse recursively
+cfg: {
+  inner: {
+    x: 2
+    y: 3
+  }
+}
+
+_(cfg.inner.x + cfg.inner.y)
