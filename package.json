@@ -5,5 +5,8 @@
   "type": "module",
   "bin": {
     "hi2js": "./cli.js"
+  },
+  "scripts": {
+    "test": "node run-tests.js"
   }
 }
