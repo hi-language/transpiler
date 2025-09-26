@@ -7,7 +7,7 @@
     "hi2js": "./cli.js"
   },
   "scripts": {
-    "build-parser": "npx nearleyc grammar.ne -o grammar.js --esm",
+    "build-parser": "npx nearleyc grammar.ne -o grammar.js",
     "test": "node test_runner.js"
   },
   "dependencies": {
