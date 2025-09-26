@@ -1,0 +1,8 @@
+// This test should pass with the current transpiler.
+
+message: "Hello from Hi!"
+_(message)
+
+count: 1
+count = 2
+_("Count is", count)
