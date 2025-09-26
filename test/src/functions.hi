@@ -1,0 +1,26 @@
+// implicit return
+add: (a, b) {
+  a + b
+}
+_(add(5, 3))
+
+// explicit return
+greet: (name) {
+  ^ "Hello, " + name
+  _("this should not print")
+}
+_(greet("Master"))
+
+// arrow function
+multiply: (a, b) => a * b
+_(multiply(2, 4))
+
+// block with side effects and return
+calculator: {
+  add: (a, b) => a + b,
+  subtract: (a, b) {
+    _("Subtracting...")
+    a - b
+  }
+}
+_(calculator.subtract(10, 3))
