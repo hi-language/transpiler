@@ -5,13 +5,14 @@
  */
 export function generate(ast) {
     if (!ast) return '';
-    
+
     const generators = {
         Program: (node) => node.body.map(generate).join('\n'),
         ExpressionStatement: (node) => `${generate(node.expression)};`,
-        
+
         VariableDeclaration: (node) => {
-            const keyword = node.value.type.includes('Function') ? 'const' : 'let';
+            const t = node.value.type;
+            const keyword = (t === 'FunctionExpression' || t === 'ArrowFunctionExpression') ? 'const' : 'let';
             return `${keyword} ${node.identifier} = ${generate(node.value)};`;
         },
         AssignmentExpression: (node) => `${generate(node.left)} = ${generate(node.right)}`,
@@ -33,13 +34,13 @@ export function generate(ast) {
             if (callee === '_') return `console.log(${args})`;
             return `${callee}(${args})`;
         },
-        
+
         MemberExpression: (node) => node.computed
             ? `${generate(node.object)}[${generate(node.property)}]`
             : `${generate(node.object)}.${generate(node.property)}`,
-            
+
         BinaryExpression: (node) => `(${generate(node.left)} ${node.operator} ${generate(node.right)})`,
-        
+
         Block: (node) => {
             let bodyCode = node.body.map(generate).join('\n');
             // Check for implicit return
@@ -57,13 +58,17 @@ export function generate(ast) {
         ArrowFunctionExpression: (node) => {
             const params = node.params.map(generate).join(', ');
             const body = generate(node.body);
-            // If body is not a block, it's an implicit return
             const bodyStr = node.body.type === 'Block' || node.body.type === 'BlockStatement' ? body : `(${body})`;
             return `(${params}) => ${bodyStr}`;
         },
 
         ArrayLiteral: (node) => `[${node.elements.map(generate).join(', ')}]`,
-        
+
+        ObjectLiteral: (node) => {
+            const props = node.properties.map(p => `${p.key}: ${generate(p.value)}`).join(', ');
+            return `{ ${props} }`;
+        },
+
         Identifier: (node) => node.name,
         ThisExpression: () => 'this',
         NumericLiteral: (node) => node.value,
@@ -77,3 +82,4 @@ export function generate(ast) {
     }
     return generators[ast.type](ast);
 }
+
