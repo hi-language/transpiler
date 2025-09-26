@@ -7,7 +7,7 @@ const tokens = {};
 const tokenList = [
     createToken({ name: 'WhiteSpace', pattern: /[ \t]+/, group: Lexer.SKIPPED }),
     createToken({ name: 'NewLine', pattern: /\n|\r\n?/, group: Lexer.SKIPPED }),
-    createToken({ name: 'Comment', pattern: /\/\/.*?$/, group: Lexer.SKIPPED }),
+    createToken({ name: 'Comment', pattern: /\/\/[^\n\r]*/, group: Lexer.SKIPPED }),
 
     createToken({ name: 'Number', pattern: /0|[1-9][0-9]*(\.[0-9]+)?/ }),
     createToken({ name: 'String', pattern: /"(?:\\["\\]|[^\n"\\])*"/ }),
