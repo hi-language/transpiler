@@ -1,0 +1,5 @@
+8
+Hello, Master
+8
+Subtracting...
+7
