@@ -1,57 +1,11 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join, basename } from 'path';
 import { execSync } from 'child_process';
-import { hi2js } from './transpiler.js';
 
 const testDir = 'test';
 const srcDir = join(testDir, 'src');
 const expectedDir = join(testDir, 'expected_output');
 const resultsFile = 'test-results.md';
-
-const testFiles = readdirSync(srcDir).filter(file => file.endsWith('.hi'));
-
-const results = [];
-
-console.log("Running Hi language tests, Master...");
-
-for (const file of testFiles) {
-  const testCaseName = basename(file, '.hi');
-  const hiFilePath = join(srcDir, file);
-  const expectedOutputPath = join(expectedDir, `${testCaseName}.txt`);
-
-  const hiCode = readFileSync(hiFilePath, 'utf-8');
-  const expectedOutput = readFileSync(expectedOutputPath, 'utf-8').trim();
-
-  let jsCode = '';
-  try {
-    jsCode = hi2js(hiCode);
-    const actualOutput = execSync('node', {
-      input: jsCode,
-      encoding: 'utf-8'
-    }).trim();
-
-    if (actualOutput === expectedOutput) {
-      results.push({ name: testCaseName, status: '✅ PASS' });
-    } else {
-      results.push({
-        name: testCaseName,
-        status: '❌ FAIL',
-        reason: 'Output mismatch',
-        expected: expectedOutput,
-        actual: actualOutput,
-        jsCode: jsCode
-      });
-    }
-  } catch (error) {
-    results.push({
-      name: testCaseName,
-      status: '❌ FAIL',
-      reason: 'Transpilation or execution error',
-      error: error.message,
-      jsCode: jsCode
-    });
-  }
-}
 
 function generateMarkdownReport(results) {
   let report = `# Hi Language Test Results\n\n`;
@@ -90,14 +44,91 @@ function generateMarkdownReport(results) {
   return report;
 }
 
-const markdownReport = generateMarkdownReport(results);
-writeFileSync(resultsFile, markdownReport);
-
-console.log(`Test run complete. Results written to ${resultsFile}`);
-
-if (results.some(r => r.status.includes('FAIL'))) {
-  console.log("Some tests failed, Master.");
-  process.exit(1);
-} else {
-  console.log("All tests passed, Master.");
+function generateBuildFailureReport(error) {
+  let report = `# Hi Language Test Results\n\n`;
+  report += `**Run at:** ${new Date().toISOString()}\n\n`;
+  report += `| Test Case | Status |\n`;
+  report += `|-----------|--------|\n`;
+  report += `| Build Step | ❌ FAIL |\n`;
+  report += `\n---\n\n## Failures\n\n`;
+  report += `### \`Build Step\`\n\n`;
+  report += `**Reason:** Master, failed to build parser from \`grammar.ne\`.\n\n`;
+  report += `**Error:**\n\`\`\`\n${error.stderr || error.message}\n\`\`\`\n\n`;
+  report += `---\n\n`;
+  return report;
 }
+
+async function run() {
+  try {
+    console.log("Building parser from grammar, Master...");
+    execSync('npm run build-parser');
+  } catch (buildError) {
+    console.error('Master, the parser build failed.');
+    const report = generateBuildFailureReport(buildError);
+    writeFileSync(resultsFile, report);
+    console.log(`Failure report written to ${resultsFile}`);
+    process.exit(1);
+    return;
+  }
+
+  // Build succeeded, now we can safely import and run tests.
+  const { hi2js } = await import('./transpiler.js');
+
+  const testFiles = readdirSync(srcDir).filter(file => file.endsWith('.hi'));
+  const results = [];
+
+  console.log("Running Hi language tests, Master...");
+
+  for (const file of testFiles) {
+    const testCaseName = basename(file, '.hi');
+    const hiFilePath = join(srcDir, file);
+    const expectedOutputPath = join(expectedDir, `${testCaseName}.txt`);
+
+    const hiCode = readFileSync(hiFilePath, 'utf-8');
+    const expectedOutput = readFileSync(expectedOutputPath, 'utf-8').trim();
+
+    let jsCode = '';
+    try {
+      jsCode = hi2js(hiCode);
+      const actualOutput = execSync('node', {
+        input: jsCode,
+        encoding: 'utf-8'
+      }).trim();
+
+      if (actualOutput === expectedOutput) {
+        results.push({ name: testCaseName, status: '✅ PASS' });
+      } else {
+        results.push({
+          name: testCaseName,
+          status: '❌ FAIL',
+          reason: 'Output mismatch',
+          expected: expectedOutput,
+          actual: actualOutput,
+          jsCode: jsCode
+        });
+      }
+    } catch (error) {
+      results.push({
+        name: testCaseName,
+        status: '❌ FAIL',
+        reason: 'Transpilation or execution error',
+        error: error.message,
+        jsCode: jsCode
+      });
+    }
+  }
+
+  const markdownReport = generateMarkdownReport(results);
+  writeFileSync(resultsFile, markdownReport);
+
+  console.log(`Test run complete. Results written to ${resultsFile}`);
+
+  if (results.some(r => r.status.includes('FAIL'))) {
+    console.log("Some tests failed, Master.");
+    process.exit(1);
+  } else {
+    console.log("All tests passed, Master.");
+  }
+}
+
+run();
