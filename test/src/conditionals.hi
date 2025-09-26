@@ -1,0 +1,10 @@
+a: 10
+b: 20
+max: (a > b) ? { a } : { b }
+_(max)
+
+status: "ok"
+(status == "ok") ? { _("Status is OK") }
+
+grade: (max > 15) ? { "A" } : { "B" }
+_(grade)
