@@ -1,0 +1,9 @@
+{
+  "name": "hi-transpiler",
+  "version": "0.1.0",
+  "description": "The Hi language to JavaScript transpiler.",
+  "type": "module",
+  "bin": {
+    "hi2js": "./cli.js"
+  }
+}
