@@ -2,7 +2,7 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { hi2js } from './transpiler.js';
+import { hi2js } from './src/index.js';
 
 function main() {
   const args = process.argv.slice(2);
