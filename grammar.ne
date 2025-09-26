@@ -1,7 +1,7 @@
 @{%
-import moo from 'moo';
+const moo = require('moo');
 
-export const lexer = moo.compile({
+const lexer = moo.compile({
   ws:      /[ \t]+/,
   nl:      { match: /\n/, lineBreaks: true },
   comment: /\/\/.*?$/,
@@ -106,7 +106,7 @@ Identifier -> %identifier {% d => ({ type: 'Identifier', name: d[0].value }) %}
 Literal -> %number {% d => ({ type: 'NumericLiteral', value: Number(d[0].value) }) %}
          | %string {% d => ({ type: 'StringLiteral', value: d[0].value }) %}
 
-Block -> %lbrace _ (KeyValuePairs):? _ %rbrace {%
+Block -> %lbrace _ (KeyValuePairs):? _ %rparen {%
   (d) => ({ type: 'Block', properties: d[2] || [] })
 %}
 
