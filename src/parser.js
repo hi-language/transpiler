@@ -139,7 +139,7 @@ class HiParser extends CstParser {
             $.RULE(name, () => {
                 $.SUBRULE(higherPrecRule, { LABEL: 'left' });
                 $.MANY(() => {
-                    $.CONSUME($.OR(operators));
+                    $.OR(operators);
                     $.SUBRULE2(higherPrecRule, { LABEL: 'right' });
                 });
             });
@@ -147,15 +147,15 @@ class HiParser extends CstParser {
 
         // Define binary expressions from highest to lowest precedence.
         buildBinaryExpressionRule('multiplicativeExpression', $.callExpression, [
-            { ALT: () => T.Star }, { ALT: () => T.Slash }
+            { ALT: () => $.CONSUME(T.Star) }, { ALT: () => $.CONSUME(T.Slash) }
         ]);
 
         buildBinaryExpressionRule('additiveExpression', $.multiplicativeExpression, [
-            { ALT: () => T.Plus }, { ALT: () => T.Minus }
+            { ALT: () => $.CONSUME(T.Plus) }, { ALT: () => $.CONSUME(T.Minus) }
         ]);
 
         buildBinaryExpressionRule('equalityExpression', $.additiveExpression, [
-            { ALT: () => T.EqEq }
+            { ALT: () => $.CONSUME(T.EqEq) }
         ]);
 
         // ConditionalExpression consumes an EqualityExpression.
