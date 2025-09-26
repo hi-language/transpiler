@@ -1,23 +1,26 @@
 # Hi Language Test Results
 
-**Run at:** 2025-09-26T08:59:05.582Z
+**Run at:** 2025-09-26T14:35:21.846Z
 
 | Test Case | Status |
 |-----------|--------|
-| Build Step | ❌ FAIL |
+| Initialization Step | ❌ FAIL |
 
 ---
 
 ## Failures
 
-### `Build Step`
+### `Initialization Step`
 
-**Reason:** Master, failed to build parser from `grammar.ne`.
+**Reason:** Master, the test runner encountered a fatal error.
 
 **Error:**
 ```
-sh: 1: nearleyc: not found
-
+SyntaxError: Unexpected identifier 'moo'
+    at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
+    at #translate (node:internal/modules/esm/loader:497:12)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:544:27)
 ```
 
 ---
