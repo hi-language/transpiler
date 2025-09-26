@@ -1,6 +1,6 @@
 # Hi Language Test Results
 
-**Run at:** 2025-09-26T14:35:21.846Z
+**Run at:** 2025-09-26T15:00:12.573Z
 
 | Test Case | Status |
 |-----------|--------|
@@ -16,11 +16,14 @@
 
 **Error:**
 ```
-SyntaxError: Unexpected identifier 'moo'
-    at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
-    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:146:18)
-    at #translate (node:internal/modules/esm/loader:497:12)
-    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:544:27)
+file:///home/runner/work/transpiler/transpiler/transpiler.js:2
+import grammar from './grammar.js';
+       ^^^^^^^
+SyntaxError: The requested module './grammar.js' does not provide an export named 'default'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:213:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:320:5)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+    at async run (file:///home/runner/work/transpiler/transpiler/test_runner.js:72:23)
 ```
 
 ---
