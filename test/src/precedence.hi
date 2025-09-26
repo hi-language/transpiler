@@ -1,0 +1,5 @@
+result: 2 + 3 * 4
+_(result) // Should be 14, not 20
+
+result2: (2 + 3) * 4
+_(result2) // Should be 20
