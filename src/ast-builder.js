@@ -6,8 +6,19 @@ const BaseHiVisitor = parser.getBaseCstVisitorConstructor();
 function buildBinaryExpression(ctx, visitor) {
     let left = visitor.visit(ctx.left);
     if (ctx.right) {
+        // Collect all possible operator tokens from the context.
+        const operators = [];
+        if (ctx.EqEq) operators.push(...ctx.EqEq);
+        if (ctx.Plus) operators.push(...ctx.Plus);
+        if (ctx.Minus) operators.push(...ctx.Minus);
+        if (ctx.Star) operators.push(...ctx.Star);
+        if (ctx.Slash) operators.push(...ctx.Slash);
+        
+        // Sort operators by their position in the source text to handle mixed operators correctly.
+        operators.sort((a, b) => a.startOffset - b.startOffset);
+
         ctx.right.forEach((rhs, i) => {
-            const operator = ctx.Or[i].image;
+            const operator = operators[i].image;
             left = {
                 type: 'BinaryExpression',
                 operator,
@@ -123,7 +134,7 @@ class AstBuilder extends BaseHiVisitor {
     block(ctx) {
         const params = ctx.parameterList ? this.visit(ctx.parameterList) : [];
         const body = this.visit(ctx.statements);
-        if (params.length > 0) {
+        if (ctx.parameterList) { // If there's a param list, it's a function
             return { type: 'FunctionExpression', params, body: { type: 'BlockStatement', body } };
         }
         return { type: 'Block', body };
