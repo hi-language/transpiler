@@ -1,0 +1,7 @@
+// Multi-property object should emit commas correctly
+cfg: {
+  a: 1
+  b: 2
+}
+
+_(cfg.a + cfg.b)
