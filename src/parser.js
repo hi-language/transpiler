@@ -14,7 +14,12 @@ class HiParser extends CstParser {
         $.RULE('statement', () => {
             $.OR([
                 { ALT: () => $.SUBRULE($.declaration) },
-                { ALT: () => $.SUBRULE($.assignment) },
+                // Gated lookahead to resolve ambiguity. An assignment must be
+                // an `assignable` expression followed by an `Eq` token.
+                {
+                    GATE: () => this.BACKTRACK($.assignable) && this.LA(1).tokenType === T.Eq,
+                    ALT: () => $.SUBRULE($.assignment)
+                },
                 { ALT: () => $.SUBRULE($.returnStatement) },
                 { ALT: () => $.SUBRULE($.expressionStatement) },
             ]);
@@ -223,4 +228,3 @@ class HiParser extends CstParser {
 }
 
 export const parser = new HiParser();
-
