@@ -1,0 +1,6 @@
+items: [10, "hello", !0]
+_(items[0])
+_(items[1])
+
+items[0] = 20
+_(items[0])
