@@ -1,0 +1,8 @@
+// This test will fail with the current regex transpiler
+// because it does not handle multi-line constructs.
+
+config: {
+  version: "0.1"
+}
+
+_(config.version)
