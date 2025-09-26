@@ -11,7 +11,9 @@
     "test": "node test_runner.js"
   },
   "dependencies": {
-    "moo": "^0.5.2",
+    "moo": "^0.5.2"
+  },
+  "devDependencies": {
     "nearley": "^2.20.1"
   }
 }
