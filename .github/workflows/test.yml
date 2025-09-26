@@ -1,0 +1,34 @@
+name: Run Hi Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run tests
+        id: run-tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Commit test results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Docs: Update test results"
+          file_pattern: test-results.md
+
+      - name: Check test step outcome
+        if: steps.run-tests.outcome == 'failure'
+        run: exit 1
