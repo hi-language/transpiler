@@ -1,4 +1,4 @@
-import { hi2js } from '../transpiler.js';
+import { hi2js } from '../src/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const hiInput = document.getElementById('hi-input');
