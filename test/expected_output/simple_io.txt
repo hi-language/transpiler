@@ -1,0 +1,2 @@
+Hello from Hi!
+Count is 2
