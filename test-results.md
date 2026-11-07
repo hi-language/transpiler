@@ -1,6 +1,6 @@
 # Hi Language Test Results
 
-**Run at:** 2025-09-26T17:14:42.404Z
+**Run at:** 2026-11-07T19:49:56.368Z
 
 | Test Case | Status |
 |-----------|--------|
@@ -41,17 +41,17 @@ let status = ("ok"((status == "ok")) ? (() => {
 
 ReferenceError: Cannot access 'status' before initialization
     at [stdin]:9:21
-    at runScriptInThisContext (node:internal/vm:209:10)
-    at node:internal/process/execution:118:14
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
     at [stdin]-wrapper:6:24
-    at runScript (node:internal/process/execution:101:62)
-    at evalScript (node:internal/process/execution:133:3)
-    at node:internal/main/eval_stdin:32:5
-    at Socket.<anonymous> (node:internal/process/execution:234:5)
-    at Socket.emit (node:events:536:35)
-    at endReadableNT (node:internal/streams/readable:1698:12)
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at evalTypeScript (node:internal/process/execution:295:3)
+    at node:internal/main/eval_stdin:51:5
+    at Socket.<anonymous> (node:internal/process/execution:205:5)
+    at Socket.emit (node:events:526:24)
 
-Node.js v20.19.5
+Node.js v24.22.2
 
 ```
 
