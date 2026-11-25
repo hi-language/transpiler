@@ -32,7 +32,7 @@ jobs:
         continue-on-error: true
 
       - name: Commit test results
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7.2.1
         with:
           commit_message: "Docs: Update test results"
           file_pattern: test-results.md
